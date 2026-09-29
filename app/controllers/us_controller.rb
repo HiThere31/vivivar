@@ -10,20 +10,33 @@ class UsController < ApplicationController
     @revealed = Day.where(date: @week).where.not(revealed_at: nil).pluck(:date).to_set
   end
 
-  # La fecha para vernos se comparte: se guarda en los dos usuarios
+  # Actualiza el nombre propio, o la fecha para vernos (compartida entre los dos)
   def update
-    date = parse_date(params[:meet_on])
-
-    if date && date >= Time.zone.today
-      User.where(id: [Current.user.id, Current.user.partner_id].compact)
-          .update_all(meet_on: date, meet_set_on: Time.zone.today, updated_at: Time.current)
-      redirect_to us_path, notice: "Fecha guardada ✈️"
-    else
-      redirect_to us_path, alert: "Elige una fecha de hoy en adelante"
-    end
+    params.key?(:name) ? update_name : update_meet_on
   end
 
   private
+    def update_name
+      name = params[:name].to_s.strip.first(30)
+
+      if name.present? && Current.user.update(name: name)
+        redirect_to us_path, notice: "Nombre guardado"
+      else
+        redirect_to us_path, alert: "Escribe tu nombre"
+      end
+    end
+
+    def update_meet_on
+      date = parse_date(params[:meet_on])
+
+      if date && date >= Time.zone.today
+        User.where(id: [Current.user.id, Current.user.partner_id].compact)
+            .update_all(meet_on: date, meet_set_on: Time.zone.today, updated_at: Time.current)
+        redirect_to us_path, notice: "Fecha guardada ✈️"
+      else
+        redirect_to us_path, alert: "Elige una fecha de hoy en adelante"
+      end
+    end
     def meet_progress
       return unless @meet_on && @meet_on >= @today
 

@@ -43,11 +43,10 @@ module ApplicationHelper
   def fecha_corta(date) = "#{DIAS[date.wday][0, 3].downcase} #{date.day} #{MESES[date.month - 1][0, 3]}"
   def inicial_dia(date) = INICIALES[(date.wday + 6) % 7]
 
-  # "Él" / "Ella" según el tema de la otra persona
-  # Nombre de la otra persona (se define en users.name)
-def partner_label(user = Current.user)
-  user&.partner&.name.presence || "Tu persona"
-end
+  # Nombre de la otra persona (se define en users.name, editable en Nosotros)
+  def partner_label(user = Current.user)
+    user&.partner&.name.presence || "Tu persona"
+  end
 
   # Estado de una celda del calendario
   def calendar_state(day, date, today)

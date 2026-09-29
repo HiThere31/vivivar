@@ -41,5 +41,19 @@
     </div>
   </div>
 
+  <div class="card card-feature" style="padding:18px 22px">
+    <div class="overline" style="letter-spacing:.06em">Tu nombre</div>
+    <%= form_with url: us_path, method: :patch, class: "mt-3 flex gap-2" do |f| %>
+      <%= f.text_field :name, value: Current.user.name, maxlength: 30, required: true,
+                              autocomplete: "given-name", class: "field", "aria-label": "Tu nombre" %>
+      <button type="submit" class="send-btn" style="width:52px;height:52px" aria-label="Guardar nombre">
+        <%= icon(:arrow_right, size: 18, stroke: 2) %>
+      </button>
+    <% end %>
+    <% if Current.user.partner %>
+      <p class="hint mt-2 text-left" style="font-size:13px">Así te ve <%= Current.user.partner.name %> en la app.</p>
+    <% end %>
+  </div>
+
   <%= button_to "Cerrar sesión", session_path, method: :delete, class: "btn btn-secondary mt-2" %>
 </div>

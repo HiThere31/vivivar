@@ -3,7 +3,7 @@
 # ── Usuarios ─────────────────────────────────────────────────────
 # Cambia emails y contraseñas antes de producción (o usa ENV)
 ella = User.find_or_create_by!(email_address: ENV.fetch("ELLA_EMAIL", "ella@vivivar.app")) do |u|
-  u.name     = "Ella"
+  u.name     = "Fer"
   u.theme    = "ella"
   u.password = ENV.fetch("ELLA_PASSWORD", "cambiame123")
 end
