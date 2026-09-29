@@ -1,0 +1,25 @@
+<% state = calendar_state(day, date, today) %>
+<% cell_class = class_names("cal-cell", "is-today": date == today, "is-future": state == :future) %>
+
+<% content = capture do %>
+  <div class="cal-box">
+    <% if state == :both %>
+      <% first, second = day.moments.sort_by { |m| m.user.theme == "ella" ? 0 : 1 } %>
+      <span class="mini-pol mini-a"><%= image_tag first.photo.variant(:thumb), alt: "" %></span>
+      <span class="mini-pol mini-b"><%= image_tag second.photo.variant(:thumb), alt: "" %></span>
+    <% elsif state == :one %>
+      <span class="mini-pol mini-one"><span class="mini-blank"></span></span>
+    <% elsif state == :locked %>
+      <span class="cal-lock"><%= icon(:lock, size: 15, stroke: 2) %></span>
+    <% else %>
+      <span class="cal-dot"></span>
+    <% end %>
+  </div>
+  <span class="cal-num"><%= date.day %></span>
+<% end %>
+
+<% if state == :both %>
+  <%= link_to content, day_path(date: date.iso8601), class: cell_class %>
+<% else %>
+  <div class="<%= cell_class %>"><%= content %></div>
+<% end %>

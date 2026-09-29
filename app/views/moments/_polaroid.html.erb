@@ -1,0 +1,29 @@
+<%# Polaroid. state: :revealed | :locked | :empty | :waiting
+    locals: moment, state, tilt (:left | :right | nil), fluid (bool), empty_caption %>
+<% tilt_class = { left: "tilt-l", right: "tilt-r" }[local_assigns[:tilt]] %>
+<div class="<%= class_names("polaroid", "polaroid-#{state}", tilt_class, "is-fluid": local_assigns[:fluid]) %>">
+  <div class="polaroid-photo">
+    <% if state == :revealed %>
+      <%= image_tag moment.photo.variant(:display), alt: moment.caption %>
+    <% elsif state == :locked %>
+      <div class="locked-blur" style="background: <%= locked_gradient(moment&.id) %>"></div>
+      <span class="lock-badge"><%= icon(:lock, size: 20, stroke: 1.75) %></span>
+    <% elsif state == :empty %>
+      <%= icon(:camera, size: 26, stroke: 1.5) %>
+      <span>Tu foto</span>
+    <% else %>
+      <span>Todavía no…</span>
+    <% end %>
+  </div>
+  <div class="polaroid-caption">
+    <% if state == :revealed %>
+      <%= moment.caption %>
+    <% elsif state == :locked %>
+      Ya envió la suya 👀
+    <% elsif state == :empty %>
+      <%= local_assigns[:empty_caption] || "¿empiezas tú?" %>
+    <% else %>
+      aún no sube la suya
+    <% end %>
+  </div>
+</div>

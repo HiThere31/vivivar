@@ -1,0 +1,11 @@
+<nav class="tabbar" aria-label="Navegación">
+  <%= link_to root_path, class: class_names("tab", "is-active": controller_name.in?(%w[today moments])) do %>
+    <%= icon(:sun, size: 24, stroke: 1.6) %>Hoy
+  <% end %>
+  <%= link_to calendar_path, class: class_names("tab", "is-active": controller_name.in?(%w[calendar days])) do %>
+    <%= icon(:calendar, size: 24, stroke: 1.6) %>Calendario
+  <% end %>
+  <%= link_to us_path, class: class_names("tab", "is-active": controller_name == "us") do %>
+    <%= icon(:heart, size: 24, stroke: 1.6) %>Nosotros
+  <% end %>
+</nav>

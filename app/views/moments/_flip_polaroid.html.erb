@@ -1,0 +1,14 @@
+<%# Polaroid de la otra persona que se voltea al revelarse. data-turbo-permanent evita que el morph la resetee. %>
+<div id="flip-<%= day.id %>" class="flip tilt-r"
+     data-turbo-permanent
+     data-controller="flip"
+     data-flip-key-value="revealed-<%= day.id %>">
+  <div class="flip-inner">
+    <div class="flip-face">
+      <%= render "moments/polaroid", moment: moment, state: :locked %>
+    </div>
+    <div class="flip-face flip-back">
+      <%= render "moments/polaroid", moment: moment, state: :revealed %>
+    </div>
+  </div>
+</div>

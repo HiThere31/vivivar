@@ -1,0 +1,44 @@
+<%# 05 Calendario %>
+<header class="flex items-end justify-between">
+  <div>
+    <div class="overline"><%= @month.year %></div>
+    <h1 class="title-lg"><%= mes_titulo(@month) %></h1>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to calendar_path(month: @month.prev_month.strftime("%Y-%m")), class: "icon-btn", "aria-label": "Mes anterior" do %>
+      <%= icon(:chevron_left, size: 18) %>
+    <% end %>
+    <% if @month < @today.beginning_of_month %>
+      <%= link_to calendar_path(month: @month.next_month.strftime("%Y-%m")), class: "icon-btn", "aria-label": "Mes siguiente" do %>
+        <%= icon(:chevron_right, size: 18) %>
+      <% end %>
+    <% else %>
+      <span class="icon-btn is-disabled"><%= icon(:chevron_right, size: 18) %></span>
+    <% end %>
+  </div>
+</header>
+
+<div class="cal-head mt-[22px]">
+  <% ApplicationHelper::INICIALES.each do |letter| %><span><%= letter %></span><% end %>
+</div>
+
+<div class="cal-grid">
+  <% (@month.beginning_of_week(:monday)..@month.end_of_month.end_of_week(:monday)).each do |date| %>
+    <% if date.month == @month.month %>
+      <%= render "calendar/cell", date: date, day: @days[date], today: @today %>
+    <% else %>
+      <div class="cal-cell"></div>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="card mt-auto flex items-center justify-between gap-3" style="padding:16px 18px">
+  <div>
+    <div style="font:500 22px/1.1 var(--f-display)"><%= @month_count %> <%= @month_count == 1 ? "recuerdo" : "recuerdos" %></div>
+    <div class="hint mt-[3px] text-left" style="font-size:13px">guardados este mes</div>
+  </div>
+  <div class="flex flex-col gap-[5px]" style="font:500 12px var(--f-sans);color:var(--muted)">
+    <span class="flex items-center gap-1.5"><span class="legend-sq"></span>Los dos</span>
+    <span class="flex items-center gap-1.5"><span class="legend-ring"></span>Falta uno</span>
+  </div>
+</div>

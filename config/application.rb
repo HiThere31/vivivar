@@ -8,6 +8,7 @@ Bundler.require(*Rails.groups)
 
 module Vivivar
   class Application < Rails::Application
+    config.time_zone = "America/Costa_Rica"
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 

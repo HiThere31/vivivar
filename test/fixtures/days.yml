@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  date: 2026-09-29
+  revealed_at: 2026-09-29 10:38:30
+  prompt_pair: one
+
+two:
+  date: 2026-09-29
+  revealed_at: 2026-09-29 10:38:30
+  prompt_pair: two

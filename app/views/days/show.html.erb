@@ -1,0 +1,44 @@
+<%# 06 Detalle del día %>
+<%= link_to calendar_path(month: @day.date.strftime("%Y-%m")), class: "back-link" do %>
+  <%= icon(:chevron_left, size: 22) %>Calendario
+<% end %>
+
+<div class="mt-3">
+  <div class="overline"><%= dia_semana(@day.date) %></div>
+  <h1 class="title-lg"><%= fecha_larga(@day.date) %></h1>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-col">
+    <div class="detail-prompt"><%= @day.prompt_for(Current.user) %></div>
+    <% if @mine %>
+      <%= render "moments/polaroid", moment: @mine, state: :revealed, tilt: :left, fluid: true %>
+    <% end %>
+    <% if @theirs&.reply.present? %>
+      <div class="mt-1 flex flex-col gap-0.5">
+        <span class="who" style="font-size:11px"><%= partner_label %> respondió</span>
+        <span class="hand"><%= @theirs.reply %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="detail-col">
+    <div class="detail-prompt"><%= @day.prompt_for(Current.user.partner) %></div>
+    <% if @theirs %>
+      <%= render "moments/polaroid", moment: @theirs, state: :revealed, tilt: :right, fluid: true %>
+    <% end %>
+    <% if @mine&.reply.present? %>
+      <div class="mt-1 flex flex-col gap-0.5">
+        <span class="who" style="font-size:11px">Tú respondiste</span>
+        <span class="hand"><%= @mine.reply %></span>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="mt-auto pt-6">
+  <div class="card">
+    <div class="overline overline-accent">La pregunta de ese día</div>
+    <div class="question-text" style="font-size:20px"><%= @day.prompt_pair.conversation_question %></div>
+  </div>
+</div>

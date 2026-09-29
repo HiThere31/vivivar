@@ -1,0 +1,82 @@
+<%# 02 Hoy pendiente · 04 Revelado %>
+<%= turbo_stream_from @day %>
+<% revealed = @day.revealed? %>
+
+<header class="flex items-end justify-between gap-2.5">
+  <div class="min-w-0">
+    <div class="overline"><%= dia_semana(@day.date) %></div>
+    <h1 class="title"><%= fecha_larga(@day.date) %></h1>
+  </div>
+  <div class="flex flex-none gap-1.5 pb-[3px]">
+    <span class="chip">🔥 <%= @streak %></span>
+    <% if @days_to_meet %>
+      <span class="chip">✈️ <%= @days_to_meet %>d</span>
+    <% end %>
+  </div>
+</header>
+
+<% unless revealed %>
+  <div class="card card-prompt mt-[22px]">
+    <div class="overline" style="letter-spacing:.06em">Tu prompt de hoy</div>
+    <div class="prompt-text"><%= @day.prompt_for(Current.user) %></div>
+  </div>
+<% end %>
+
+<div class="polaroid-pair <%= revealed ? "mt-7" : "mt-10" %>">
+  <div class="polaroid-col">
+    <span class="who">Tú</span>
+    <%= render "moments/polaroid", moment: @mine, tilt: :left, state: (@mine ? :revealed : :empty) %>
+  </div>
+
+  <div class="polaroid-col">
+    <span class="who"><%= partner_label %></span>
+    <% if revealed && @theirs %>
+      <%= render "moments/flip_polaroid", moment: @theirs, day: @day %>
+    <% elsif @theirs %>
+      <%= render "moments/polaroid", moment: @theirs, tilt: :right, state: :locked %>
+    <% else %>
+      <%= render "moments/polaroid", moment: nil, tilt: :right, state: :waiting %>
+    <% end %>
+  </div>
+</div>
+
+<% if revealed && @mine && @theirs %>
+  <div class="reveal-after">
+    <% if @mine.reply.blank? %>
+      <%= form_with model: @mine, class: "reply-field" do |f| %>
+        <%= f.text_field :reply, placeholder: "Responde a su foto en una línea…",
+                                 maxlength: 80, autocomplete: "off", required: true, "aria-label": "Tu respuesta" %>
+        <button type="submit" class="send-btn" aria-label="Enviar respuesta"><%= icon(:arrow_right, size: 18, stroke: 2) %></button>
+      <% end %>
+    <% else %>
+      <div class="card">
+        <div class="overline" style="letter-spacing:.06em">Tú respondiste</div>
+        <div class="hand mt-1"><%= @mine.reply %></div>
+      </div>
+    <% end %>
+
+    <% if @theirs.reply.present? %>
+      <div class="card">
+        <div class="overline" style="letter-spacing:.06em"><%= partner_label %> respondió a tu foto</div>
+        <div class="hand mt-1"><%= @theirs.reply %></div>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div class="overline overline-accent">Para conversar hoy</div>
+      <div class="question-text"><%= @day.prompt_pair.conversation_question %></div>
+    </div>
+  </div>
+<% else %>
+  <p class="hint mt-[30px]">Se revelan cuando los dos suban la suya.</p>
+
+  <div class="mt-auto pt-6">
+    <% if @mine %>
+      <p class="hint">Listo. Se revela en cuanto suba la suya 💌</p>
+    <% else %>
+      <%= link_to new_moment_path, class: "btn" do %>
+        <%= icon(:camera) %>Tomar mi foto
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

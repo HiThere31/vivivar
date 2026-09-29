@@ -1,0 +1,45 @@
+<%# 07 Nosotros %>
+<div class="flex flex-col gap-3.5">
+  <h1 class="title-lg mb-1">Nosotros</h1>
+
+  <div class="card card-feature">
+    <div class="overline" style="letter-spacing:.06em">Para vernos</div>
+    <% if @progress %>
+      <div class="mt-0.5 flex items-baseline gap-2.5">
+        <span class="count-num"><%= (@meet_on - @today).to_i %></span>
+        <span class="count-unit"><%= (@meet_on - @today).to_i == 1 ? "día" : "días" %></span>
+        <span class="ml-auto" style="font:500 14px var(--f-sans);color:var(--muted)"><%= fecha_corta(@meet_on) %> ✈️</span>
+      </div>
+      <div class="progress"><div style="width: <%= @progress %>%"></div></div>
+    <% else %>
+      <div class="question-text" style="margin-top:4px">¿Cuándo se vuelven a ver?</div>
+    <% end %>
+
+    <details class="mt-3" <%= "open" unless @progress %>>
+      <summary class="small-link"><%= @progress ? "Cambiar fecha" : "Poner fecha" %></summary>
+      <%= form_with url: us_path, method: :patch, class: "mt-3 flex gap-2" do |f| %>
+        <%= f.date_field :meet_on, value: @meet_on, min: @today, required: true, class: "field" %>
+        <button type="submit" class="send-btn" style="width:52px;height:52px" aria-label="Guardar fecha">
+          <%= icon(:arrow_right, size: 18, stroke: 2) %>
+        </button>
+      <% end %>
+    </details>
+  </div>
+
+  <div class="card card-feature" style="padding:18px 22px">
+    <div class="flex items-baseline justify-between">
+      <span style="font:500 22px var(--f-display)">🔥 <%= @streak %> <%= @streak == 1 ? "día seguido" : "días seguidos" %></span>
+      <span style="font:500 13px var(--f-sans);color:var(--muted)">récord <%= @best %></span>
+    </div>
+    <div class="week-dots">
+      <% @week.each do |date| %>
+        <% dot = if @revealed.include?(date) then "is-done"
+                 elsif date == @today then "is-today"
+                 else "is-off" end %>
+        <div><span class="streak-dot <%= dot %>"></span><%= inicial_dia(date) %></div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= button_to "Cerrar sesión", session_path, method: :delete, class: "btn btn-secondary mt-2" %>
+</div>

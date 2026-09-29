@@ -1,0 +1,28 @@
+<%# 01 Bienvenida + login %>
+<% content_for :hide_tabs, "1" %>
+
+<div class="flex flex-1 flex-col pt-4">
+  <div class="welcome-stack" aria-hidden="true">
+    <div class="ws ws-1"><div style="background:linear-gradient(160deg,#A9C1DB,#F3CDB0)"></div></div>
+    <div class="ws ws-2"><div style="background:linear-gradient(200deg,#E7B89A,#B5836B)"></div></div>
+    <div class="ws ws-3"><div style="background:linear-gradient(170deg,#C9D3B9,#8FA98F)"></div><span>hoy, 8:12 p. m.</span></div>
+  </div>
+
+  <h1 class="welcome-title">Nuestro diario</h1>
+  <p class="hint text-left" style="font-size:16px">Una foto y unas palabras al día. Se revelan cuando los dos suben la suya.</p>
+
+  <%# Solo se muestra si NO está abierta como app instalada %>
+  <div class="list-card mt-[26px]" data-controller="install-hint">
+    <div class="list-row"><span class="list-num">1</span><span class="flex-1">Toca Compartir en Safari</span><span style="color:var(--muted)"><%= icon(:share, stroke: 1.6) %></span></div>
+    <div class="list-row"><span class="list-num">2</span><span class="flex-1">Elige “Agregar a inicio”</span><span style="color:var(--muted)"><%= icon(:plus_square, stroke: 1.6) %></span></div>
+    <div class="list-row"><span class="list-num">3</span><span class="flex-1">Ábrela desde el ícono</span><span style="color:var(--muted)"><%= icon(:heart, stroke: 1.6) %></span></div>
+  </div>
+
+  <%= form_with url: session_path, class: "mt-auto flex flex-col gap-2.5 pt-6" do |form| %>
+    <%= form.email_field :email_address, required: true, autocomplete: "username",
+                                         placeholder: "Tu correo", value: params[:email_address], class: "field" %>
+    <%= form.password_field :password, required: true, autocomplete: "current-password",
+                                       placeholder: "Contraseña", maxlength: 72, class: "field" %>
+    <button type="submit" class="btn mt-1">Entrar</button>
+  <% end %>
+</div>

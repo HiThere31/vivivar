@@ -1,0 +1,44 @@
+<%# 03 Componer %>
+<% content_for :hide_tabs, "1" %>
+
+<%= form_with model: @moment, class: "flex flex-1 flex-col", data: { controller: "photo-picker" } do |f| %>
+  <div class="compose-top">
+    <%= link_to "Cancelar", root_path, class: "compose-cancel" %>
+    <span class="compose-title">Tu foto de hoy</span>
+    <span></span>
+  </div>
+
+  <p class="compose-prompt"><%= @day.prompt_for(Current.user) %></p>
+
+  <% if @moment.errors.any? %>
+    <div class="flash mt-4"><%= @moment.errors.map(&:message).uniq.join(" · ") %></div>
+  <% end %>
+
+  <%= f.file_field :photo, accept: "image/*", capture: "environment", class: "sr-only",
+                           data: { photo_picker_target: "input", action: "change->photo-picker#preview" } %>
+
+  <div class="polaroid polaroid-xl">
+    <label for="moment_photo" class="polaroid-photo" data-photo-picker-target="frame">
+      <img data-photo-picker-target="preview" alt="Vista previa" hidden>
+      <span class="compose-placeholder" data-photo-picker-target="placeholder">
+        <%= icon(:camera, size: 32, stroke: 1.5) %>
+        Toca para tomar tu foto
+      </span>
+    </label>
+    <%= f.text_area :caption, rows: 2, maxlength: 80, required: true,
+                              placeholder: "¿Qué significa para ti?",
+                              class: "caption-input",
+                              data: { photo_picker_target: "caption", action: "input->photo-picker#count" } %>
+  </div>
+
+  <p class="compose-help">Toca el texto para editarlo · <span data-photo-picker-target="counter">0</span>/80</p>
+
+  <div class="compose-actions">
+    <button type="button" class="btn btn-secondary" hidden
+            data-photo-picker-target="retake" data-action="photo-picker#retake">Repetir</button>
+    <button type="submit" class="btn btn-send" disabled
+            data-photo-picker-target="submit" data-turbo-submits-with="Enviando…">
+      Enviar <%= icon(:arrow_right, size: 18, stroke: 2) %>
+    </button>
+  </div>
+<% end %>
