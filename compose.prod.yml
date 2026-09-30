@@ -1,0 +1,76 @@
+# Producción: app + Postgres + Cloudflare Tunnel + backups diarios
+# Levantar:  bin/server-up    (la primera vez crea el .env)
+name: vivivar
+
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: vivivar
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD en .env}
+      TZ: America/Costa_Rica
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vivivar"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?Falta RAILS_MASTER_KEY en .env}
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: vivivar
+      DB_PASSWORD: ${DB_PASSWORD}
+      VIVIVAR_DATABASE_PASSWORD: ${DB_PASSWORD}
+      SOLID_QUEUE_IN_PUMA: "true"        # jobs + recordatorio de las 8 p. m.
+      TZ: America/Costa_Rica
+      EL_EMAIL: ${EL_EMAIL:-}
+      EL_PASSWORD: ${EL_PASSWORD:-}
+      ELLA_EMAIL: ${ELLA_EMAIL:-}
+      ELLA_PASSWORD: ${ELLA_PASSWORD:-}
+    volumes:
+      - storage:/rails/storage          # fotos
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: always
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Falta TUNNEL_TOKEN en .env}
+    depends_on:
+      - app
+
+  backup:
+    image: postgres:17
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGUSER: vivivar
+      PGPASSWORD: ${DB_PASSWORD}
+      TZ: America/Costa_Rica
+    volumes:
+      - ./backups:/backups
+    # Una copia de la base de datos al día; guarda los últimos 14 días
+    entrypoint: >
+      sh -c 'while true; do
+        pg_dumpall | gzip > /backups/db-$$(date +%F).sql.gz &&
+        echo "backup ok $$(date)";
+        find /backups -name "db-*.sql.gz" -mtime +14 -delete;
+        sleep 86400;
+      done'
+
+volumes:
+  pgdata:
+  storage:

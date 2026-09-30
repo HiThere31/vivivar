@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Levanta la app en el servidor. La primera vez pregunta los datos y crea .env
+# Uso (en el servidor, dentro del repo):  bin/server-up
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+say()  { printf "\n\033[1;35m==> %s\033[0m\n" "$*"; }
+fail() { printf "\033[1;31m✗ %s\033[0m\n" "$*"; exit 1; }
+COMPOSE=(docker compose -f compose.prod.yml)
+
+[ -f config/master.key ] || fail "Falta config/master.key (cópialo desde tu laptop con scp)"
+
+if [ ! -f .env ]; then
+  say "Configuración inicial (se guarda en .env, que NO se sube a git)"
+  read -rp  "Token del tunnel de Cloudflare: " TUNNEL_TOKEN
+  read -rp  "Tu correo para entrar: " EL_EMAIL
+  read -rsp "Tu contraseña: " EL_PASSWORD; echo
+  read -rp  "Correo de Fer: " ELLA_EMAIL
+  read -rsp "Contraseña de Fer: " ELLA_PASSWORD; echo
+
+  umask 077
+  cat > .env <<EOF
+RAILS_MASTER_KEY=$(cat config/master.key)
+DB_PASSWORD=$(openssl rand -hex 24)
+TUNNEL_TOKEN=${TUNNEL_TOKEN}
+EL_EMAIL=${EL_EMAIL}
+EL_PASSWORD=${EL_PASSWORD}
+ELLA_EMAIL=${ELLA_EMAIL}
+ELLA_PASSWORD=${ELLA_PASSWORD}
+EOF
+  echo "✓ .env creado"
+  FIRST_RUN=1
+fi
+
+mkdir -p backups
+
+say "Construyendo y levantando (la primera vez tarda varios minutos)"
+"${COMPOSE[@]}" up -d --build
+
+say "Esperando a que la app arranque"
+for _ in $(seq 1 60); do
+  if "${COMPOSE[@]}" exec -T app curl -fsS http://localhost/up >/dev/null 2>&1; then
+    echo "✓ App arriba"
+    break
+  fi
+  sleep 3
+done
+
+if [ "${FIRST_RUN:-0}" = 1 ]; then
+  say "Creando usuarios y prompts"
+  "${COMPOSE[@]}" exec -T app bin/rails db:seed
+fi
+
+say "Estado"
+"${COMPOSE[@]}" ps
+cat <<EOF
+
+  Logs de la app:     docker compose -f compose.prod.yml logs -f app
+  Logs del tunnel:    docker compose -f compose.prod.yml logs -f tunnel
+  Actualizar código:  git pull && bin/server-up
+EOF
