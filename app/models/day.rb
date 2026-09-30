@@ -54,9 +54,12 @@ class Day < ApplicationRecord
     user&.theme == "el" ? prompt_pair.prompt_b : prompt_pair.prompt_a
   end
 
+  # Devuelve true solo a quien efectivamente reveló (evita avisos dobles si suben al mismo tiempo)
   def reveal_if_complete!
-    return if revealed?
+    return false if revealed? || moments.count < 2
 
-    update!(revealed_at: Time.current) if moments.count >= 2
+    won = Day.where(id: id, revealed_at: nil).update_all(revealed_at: Time.current, updated_at: Time.current) == 1
+    reload if won
+    won
   end
 end

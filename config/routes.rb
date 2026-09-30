@@ -10,6 +10,13 @@ Rails.application.routes.draw do
   get "dias/:date" => "days#show", as: :day
   resource :nosotros, only: %i[show update], controller: "us", as: :us
 
+  # Notificaciones
+  resources :push_subscriptions, only: :create do
+    post :test, on: :collection
+  end
+  resource :notification_settings, only: :update, path: "notificaciones"
+  post "pensando" => "thinking#create", as: :thinking
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   # PWA

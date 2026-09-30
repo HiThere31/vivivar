@@ -10,4 +10,14 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :theme, inclusion: { in: THEMES }
+
+  # Preferencias de los toggles en Nosotros
+  def wants_push?(kind)
+    case kind.to_sym
+    when :upload then notify_uploads
+    when :reveal, :reply then notify_reveals
+    when :reminder then notify_reminder
+    else true # thinking, test
+    end
+  end
 end

@@ -41,6 +41,49 @@
     </div>
   </div>
 
+  <% if Current.user.partner %>
+    <%= button_to thinking_path, class: "btn btn-featured", data: { turbo_submits_with: "Enviando… 💭" } do %>
+      Pensando en ti 💭
+    <% end %>
+  <% end %>
+
+  <div class="list-card" style="padding:4px 20px">
+    <%# Estado del dispositivo (permanente para que el morph no lo resetee) %>
+    <div id="push-device" class="push-device" data-turbo-permanent
+         data-controller="push" data-push-vapid-key-value="<%= vapid_public_key %>">
+      <div class="flex-1">
+        <div style="font:500 15px var(--f-sans)">Notificaciones</div>
+        <div class="push-status" data-push-target="status">Revisando…</div>
+      </div>
+      <button type="button" class="chip push-enable" hidden
+              data-push-target="button" data-action="push#enable">
+        <%= icon(:bell, size: 16) %>Activar
+      </button>
+    </div>
+
+    <%= form_with model: Current.user, url: notification_settings_path, method: :patch,
+                  data: { controller: "auto-submit" } do |f| %>
+      <label class="toggle-row">
+        <span class="flex-1">Cuando sube su foto</span>
+        <%= f.check_box :notify_uploads, class: "toggle", data: { action: "auto-submit#submit" } %>
+      </label>
+      <label class="toggle-row">
+        <span class="flex-1">Cuando se revelan o te responde</span>
+        <%= f.check_box :notify_reveals, class: "toggle", data: { action: "auto-submit#submit" } %>
+      </label>
+      <label class="toggle-row">
+        <span class="flex flex-1 flex-col gap-0.5">
+          <span>Recordatorio diario</span>
+          <span style="font:400 13px var(--f-sans);color:var(--muted)">8:00 p. m. si falta tu foto</span>
+        </span>
+        <%= f.check_box :notify_reminder, class: "toggle", data: { action: "auto-submit#submit" } %>
+      </label>
+    <% end %>
+  </div>
+
+  <%= button_to "Enviar notificación de prueba", test_push_subscriptions_path,
+                class: "small-link", form_class: "text-center", style: "background:none;border:0;padding:0" %>
+
   <div class="card card-feature" style="padding:18px 22px">
     <div class="overline" style="letter-spacing:.06em">Tu nombre</div>
     <%= form_with url: us_path, method: :patch, class: "mt-3 flex gap-2" do |f| %>

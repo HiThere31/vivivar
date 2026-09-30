@@ -32,6 +32,10 @@ module ApplicationHelper
             "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true")
   end
 
+  def vapid_public_key
+    PushNotifier.public_key.to_s
+  end
+
   def locked_gradient(seed)
     LOCKED_GRADIENTS[seed.to_i % LOCKED_GRADIENTS.size]
   end

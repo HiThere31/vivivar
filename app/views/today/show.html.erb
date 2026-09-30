@@ -15,6 +15,13 @@
   </div>
 </header>
 
+<%# Solo aparece si todavía no se han pedido permisos de notificación en este teléfono %>
+<div id="push-banner" class="push-banner" hidden data-turbo-permanent
+     data-controller="push" data-push-mode-value="banner" data-push-vapid-key-value="<%= vapid_public_key %>">
+  <span class="flex-1">Activa las notificaciones para saber cuándo sube su foto.</span>
+  <button type="button" class="chip push-enable" data-action="push#enable"><%= icon(:bell, size: 16) %>Activar</button>
+</div>
+
 <% unless revealed %>
   <div class="card card-prompt mt-[22px]">
     <div class="overline" style="letter-spacing:.06em">Tu prompt de hoy</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_30_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,6 +103,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_190000) do
     t.integer "partner_id"
     t.date "meet_on"
     t.date "meet_set_on"
+    t.boolean "notify_uploads", default: true, null: false
+    t.boolean "notify_reveals", default: true, null: false
+    t.boolean "notify_reminder", default: true, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["partner_id"], name: "index_users_on_partner_id"
   end
